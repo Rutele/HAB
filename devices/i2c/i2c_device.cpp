@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <string>
 #include <cstring>
-#include <iostream>
 
 #define INIT_ERR "I2C device init error. "
 #define READ_ERR "I2C device read error. "
