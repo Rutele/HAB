@@ -1,9 +1,9 @@
-#include <string>
-
 #ifndef I2C_DEVICE_H
 #define I2C_DEVICE_H
 
-class I2C_Device {
+#include <string>
+
+class I2C_Device { 
 private:
 	int file_descriptor, device_address, data, write_status;
 public:
