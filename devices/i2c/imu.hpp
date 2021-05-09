@@ -11,10 +11,25 @@
 #define ACCEL_ZOUT_H 63
 #define ACCEL_ZOUT_L 64
 
+#define TEMP_OUT_H 65
+#define TEMP_OUT_L 66
+
+#define PWR_MGMT_1 107
+#define PWR_MGMT_2 108
+
 class IMU : public I2C_Device {
 private:
+	//Parameters
 	int acc_x_lsb, acc_y_lsb, acc_z_lsb, acc_g_scale_factor;
 	double acc_x_g, acc_y_g, acc_z_g;
+	
+	enum Direction {X, Y, Z};
+
+	//Private functions
+	void onInit();
+
+	//Accelerometer functions
+	int readAccelLSB(Direction d);
 public:
 	IMU();
 	IMU(int address);
@@ -30,6 +45,5 @@ public:
 	double getAccelX_G();
 	double getAccelY_G();
 	double getAccelZ_G();
-	
 };
 #endif

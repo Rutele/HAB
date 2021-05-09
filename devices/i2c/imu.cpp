@@ -1,38 +1,51 @@
 #include "imu.hpp"
+#include <iostream>
+
+void IMU::onInit() {
+	setAccelScale(2);
+}
+
+int IMU::readAccelLSB(Direction d) {
+	int acc_reading_h = 0;
+	int acc_reading_l = 0;
+	switch (d) {
+		case X:
+			acc_reading_h = readReg8Bits(ACCEL_XOUT_H);
+			acc_reading_l = readReg8Bits(ACCEL_XOUT_L);
+			break;
+		case Y:
+			acc_reading_h = readReg8Bits(ACCEL_YOUT_H);
+			acc_reading_l = readReg8Bits(ACCEL_YOUT_L);
+			break;
+		case Z:
+			acc_reading_h = readReg8Bits(ACCEL_ZOUT_H);
+			acc_reading_l = readReg8Bits(ACCEL_ZOUT_L);
+			break;
+	}
+	return ((acc_reading_h << 8) | (acc_reading_l));
+}
 
 IMU::IMU() : I2C_Device(0x68) {
-	setAccelScale(16);
+	onInit();
 }
 
 IMU::IMU(int address) : I2C_Device(address) {
-	setAccelScale(16);
+	onInit();
 }
 
 void IMU::readAccelX() {
-	int acc_result = 0;
-	acc_result |= readReg8Bits(ACCEL_XOUT_H); 
-	acc_result = acc_result << 8;
-	acc_result |= readReg8Bits(ACCEL_XOUT_L);
-	acc_x_lsb = acc_result;
+	acc_x_lsb = readAccelLSB(X);
 	acc_x_g = (static_cast<double>(acc_x_lsb) / static_cast<double>(acc_g_scale_factor)); 
 }
 
 
 void IMU::readAccelY() {
-	int acc_result = 0;
-	acc_result |= readReg8Bits(ACCEL_YOUT_H); 
-	acc_result = acc_result << 8;
-	acc_result |= readReg8Bits(ACCEL_YOUT_L);
-	acc_y_lsb = acc_result;
+	acc_y_lsb = readAccelLSB(Y);
 	acc_y_g = (static_cast<double>(acc_y_lsb) / static_cast<double>(acc_g_scale_factor)); 
 }
 
 void IMU::readAccelZ() {
-	int acc_result = 0;
-	acc_result |= readReg8Bits(ACCEL_ZOUT_H); 
-	acc_result = acc_result << 8;
-	acc_result |= readReg8Bits(ACCEL_ZOUT_L);
-	acc_z_lsb = acc_result;
+	acc_z_lsb = readAccelLSB(Z);
 	acc_z_g = (static_cast<double>(acc_z_lsb) / static_cast<double>(acc_g_scale_factor)); 
 }
 
@@ -62,3 +75,4 @@ int IMU::getAccelZ_LSB() { return acc_z_lsb; }
 double IMU::getAccelX_G() { return acc_x_g; }
 double IMU::getAccelY_G() { return acc_y_g; }
 double IMU::getAccelZ_G() { return acc_z_g; }
+
