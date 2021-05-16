@@ -2,11 +2,13 @@
 #define SERIAL_H
 
 #define TTYAMA0 22
+#define BUFF_SIZE 4096
 
 class Serial_Device {
 private:
 	int port_number, baud_rate;
 	bool is_open;
+	unsigned char buf[BUFF_SIZE];
 
 	//Private functions
 	void onInit();
@@ -18,6 +20,8 @@ public:
 	void openDevice();
 	void closeDevice();
 	bool checkIsOpen();
+	
+	void readDevice();
 
 	int getPortNumber();
 	int getBaudRate();
