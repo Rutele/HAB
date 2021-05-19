@@ -1,6 +1,5 @@
 #include "serial.hpp"
 #include "rs232.h"
-#include <iostream>
 
 void Serial_Device::onInit() {
 	is_open = false;
@@ -15,6 +14,11 @@ Serial_Device::Serial_Device(int p_num, int b_rate) : port_number(p_num), baud_r
 	onInit();
 }
 
+Serial_Device::~Serial_Device() {
+	RS232_CloseComport(port_number);
+	is_open = false;
+}
+
 void Serial_Device::openDevice() {
 	RS232_OpenComport(port_number, baud_rate, "8N1", 0);
 	is_open = true;
@@ -27,13 +31,30 @@ void Serial_Device::closeDevice() {
 
 bool Serial_Device::checkIsOpen() { return is_open; }
 
-void Serial_Device::readDevice() {
-	int n = RS232_PollComport(port_number, buf, BUFF_SIZE);
-	for (int i = 0; i < n; ++i) std::cout << buf[i];
-	std::cout << std::endl;
+int Serial_Device::receiveData() {
+	return RS232_PollComport(port_number, buf, BUFF_SIZE);
+}
+
+int Serial_Device::sendData(const std::string &msg) {
+	RS232_cputs(port_number, msg.c_str());
+	return msg.size();
+}
+
+int Serial_Device::sendData(std::string &&msg) {
+	RS232_cputs(port_number, msg.c_str());
+	return msg.size();
 }
 
 int Serial_Device::getPortNumber() { return port_number; }
 int Serial_Device::getBaudRate() { return baud_rate; }
-void Serial_Device::setPortNumber(int p_num) { port_number = p_num; }
-void Serial_Device::setBaudRate(int b_rate) { baud_rate = b_rate; }
+void Serial_Device::setPortNumber(int p_num) {
+	if (checkIsOpen()) closeDevice();
+	port_number = p_num; 
+}
+
+void Serial_Device::setBaudRate(int b_rate) { 
+	if (checkIsOpen()) closeDevice();
+	baud_rate = b_rate;
+}
+
+const unsigned char* Serial_Device::getBuffer() const { return buf; }
