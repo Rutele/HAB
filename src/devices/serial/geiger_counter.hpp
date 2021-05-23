@@ -9,6 +9,9 @@ class Geiger_Counter : public Serial_Device {
 private:
 	float voltage;
 	unsigned int cpm, cps, cpm_hi, cpm_lo;
+
+	//Private functions
+	unsigned int convertReadBytes();
 public:
 	Geiger_Counter();
 	
@@ -16,6 +19,13 @@ public:
 	void reboot();	
 	void turnOn();
 	void turnOff();
+
+	//Read parameters
+	unsigned int readCPM();
+	unsigned int readCPM_HI();
+	unsigned int readCPM_LO();
+	unsigned int readCPS();
+	float readVoltage();
 
 	//Getters
 	float getVoltage();

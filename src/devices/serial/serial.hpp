@@ -32,7 +32,7 @@ public:
 	int getBaudRate();
 	void setPortNumber(int p_num);
 	void setBaudRate(int b_rate);
-	const unsigned char* getBuffer() const;
+	const unsigned char* getBuffer();
 
 };
 

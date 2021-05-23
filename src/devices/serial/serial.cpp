@@ -57,4 +57,4 @@ void Serial_Device::setBaudRate(int b_rate) {
 	baud_rate = b_rate;
 }
 
-const unsigned char* Serial_Device::getBuffer() const { return buf; }
+const unsigned char* Serial_Device::getBuffer() { return buf; }
