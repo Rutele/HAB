@@ -9,9 +9,15 @@
 #define READ_ERR "I2C device read error. "
 #define WRITE_ERR "I2C device write error. "
 
-I2C_Device::I2C_Device(int address) : file_descriptor(-1), device_address(address), data(0), write_status(0) { 
+I2C_Device::I2C_Device() : file_descriptor(-1), device_address(0), data(0), write_status(0) {}
+
+I2C_Device::I2C_Device(int address) : file_descriptor(-1), device_address(address), data(0), write_status(0) {
+	openDevice();
+}
+
+void I2C_Device::openDevice() {
 	file_descriptor = wiringPiI2CSetup(device_address);
-	if (file_descriptor == -1) makeException(INIT_ERR); 
+	if (file_descriptor == -1) makeException(INIT_ERR);
 }
 
 int I2C_Device::readDevice() {
@@ -42,7 +48,9 @@ int I2C_Device::readReg16Bits(int reg) {
 	else return data;
 }
 
-void I2C_Device::makeException(std::string &&msg) {
+void I2C_Device::makeException(std::string &&msg)  {
 	std::string err_str = msg + std::string(std::strerror(errno));
 	throw std::runtime_error(msg);
 }
+
+void I2C_Device::setAdress(int add) { device_address = add; }

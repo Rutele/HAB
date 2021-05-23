@@ -12,6 +12,8 @@ private:
 
 	//Private functions
 	unsigned int convertReadBytes();
+	void parseConfig() override;
+
 public:
 	Geiger_Counter();
 	

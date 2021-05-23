@@ -24,12 +24,11 @@ private:
 	double acc_x_g, acc_y_g, acc_z_g;
 	
 	enum Direction {X, Y, Z};
-
-	//Private functions
+	
+	void parseConfig() override;
 	void onInit();
-
-	//Accelerometer functions
 	int readAccelLSB(Direction d);
+
 public:
 	IMU();
 	IMU(int address);

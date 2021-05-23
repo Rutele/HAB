@@ -1,17 +1,11 @@
 #include "serial.hpp"
 #include "rs232.h"
+#include <stdexcept>
 
-void Serial_Device::onInit() {
-	is_open = false;
-	openDevice();
+Serial_Device::Serial_Device() : port_number(TTYAMA0), baud_rate(9600), is_open(false), mode("8N1"), read_timeout (500) {
 }
 
-Serial_Device::Serial_Device() : port_number(TTYAMA0), baud_rate(9600), is_open(false) {
-	onInit();
-}
-
-Serial_Device::Serial_Device(int p_num, int b_rate) : port_number(p_num), baud_rate(b_rate), is_open(false) {
-	onInit();
+Serial_Device::Serial_Device(int p_num, int b_rate) : port_number(p_num), baud_rate(b_rate), is_open(false), mode("8N1"), read_timeout(500) {
 }
 
 Serial_Device::~Serial_Device() {
@@ -19,8 +13,12 @@ Serial_Device::~Serial_Device() {
 	is_open = false;
 }
 
+void Serial_Device::makeException(std::string &&msg) {
+	throw std::runtime_error(msg);
+}
+
 void Serial_Device::openDevice() {
-	RS232_OpenComport(port_number, baud_rate, "8N1", 0);
+	RS232_OpenComport(port_number, baud_rate, mode.c_str(), 0);
 	is_open = true;
 }
 
@@ -45,8 +43,18 @@ int Serial_Device::sendData(std::string &&msg) {
 	return msg.size();
 }
 
+int Serial_Device::getReadTimeout() { return read_timeout; }
 int Serial_Device::getPortNumber() { return port_number; }
 int Serial_Device::getBaudRate() { return baud_rate; }
+std::string Serial_Device::getMode() { return mode; }
+
+void Serial_Device::setReadTimeout(int t) { read_timeout = t; }
+
+void Serial_Device::setMode(const std::string &m) {
+	if (checkIsOpen()) closeDevice();
+	mode = m;
+}
+
 void Serial_Device::setPortNumber(int p_num) {
 	if (checkIsOpen()) closeDevice();
 	port_number = p_num; 

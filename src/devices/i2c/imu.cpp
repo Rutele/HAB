@@ -1,7 +1,41 @@
 #include "imu.hpp"
-#include <iostream>
+#include "../rapidjson/document.h"
+#include "../rapidjson/filereadstream.h"
+#include <string>
+
+#define JSON_BUFFER_SIZE 65536
+
+void IMU::parseConfig() {
+	bool proper_config = false;
+	std::string config_file_name = "devices_config.json";
+	FILE *config_file = fopen(config_file_name.c_str(), "rb");
+
+	if (config_file == NULL) {
+		makeException("No config file found!");
+	}
+
+	char json_buffer[JSON_BUFFER_SIZE];
+	rapidjson::FileReadStream input_stream(config_file, json_buffer, sizeof(json_buffer));
+	rapidjson::Document parsedConfig;
+	parsedConfig.ParseStream<0, rapidjson::UTF8<>, rapidjson::FileReadStream>(input_stream);
+
+	if (parsedConfig.HasMember("imu")) {
+		proper_config = true;
+		if(!parsedConfig["imu"].HasMember("i2c_address")) proper_config = false;
+		if(!parsedConfig["imu"].HasMember("accel_scale")) proper_config = false;
+	}
+
+	if (!proper_config) {
+		makeException("Bad config file");
+	}
+
+	setAdress(parsedConfig["imu"]["i2c_address"].GetInt());
+	openDevice();
+	setAccelScale(parsedConfig["imu"]["accel_scale"].GetInt());
+}
 
 void IMU::onInit() {
+	parseConfig();
 	setAccelScale(2);
 }
 
@@ -25,7 +59,7 @@ int IMU::readAccelLSB(Direction d) {
 	return ((acc_reading_h << 8) | (acc_reading_l));
 }
 
-IMU::IMU() : I2C_Device(0x68) {
+IMU::IMU() : I2C_Device() {
 	onInit();
 }
 
