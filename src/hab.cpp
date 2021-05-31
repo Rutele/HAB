@@ -8,5 +8,6 @@ int main() {
 	std::cout << "Geiger volt: " << gc.readVoltage() << std::endl;
 	i.readAccelX();
 	std::cout << "IMU X ACC: " << i.getAccelX_G() << std::endl;
+	std::cout << "CPM: " << gc.readCPM() << std::endl;
 	return 0;
 }
