@@ -34,10 +34,7 @@ void IMU::parseConfig() {
 	setAccelScale(parsedConfig["imu"]["accel_scale"].GetInt());
 }
 
-void IMU::onInit() {
-	parseConfig();
-	setAccelScale(2);
-}
+void IMU::onInit() { parseConfig(); }
 
 int IMU::readAccelLSB(Direction d) {
 	int acc_reading_h = 0;
