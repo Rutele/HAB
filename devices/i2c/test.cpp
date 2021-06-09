@@ -5,8 +5,14 @@
 #include <Adafruit_Sensor.h>
 #include <cerrno>
 #include <stdexcept>
-#include <string>
-#include <cstring>
+#include <wiringPi.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+#define MAXTIMINGS	85
+#define DHTPIN		7
+int dht11_dat[5] = { 0, 0, 0, 0, 0 };
 
 #define INIT_ERR "I2C device init error. "
 #define READ_ERR "I2C device read error. "
@@ -22,25 +28,58 @@ void TEST::openDevice() {
 	file_descriptor = Adafruit_I2CDevice(device_address);
 	if (file_descriptor == -1) makeException(INIT_ERR);
 }
-
-int TEST::ReadMeasurements(Measurements d) {
-	int acc_reading_h = 0;
-	int acc_reading_l = 0;
-	switch (d) {
-		case P:
-			acc_reading_h = readReg8Bits(ACCEL_XOUT_H);
-			acc_reading_l = readReg8Bits(ACCEL_XOUT_L);
+ 
+void read_dht11_dat()
+{
+	uint8_t laststate	= HIGH;
+	uint8_t counter		= 0;
+	uint8_t j		= 0, i;
+	float	f; 
+ 
+	dht11_dat[0] = dht11_dat[1] = dht11_dat[2] = dht11_dat[3] = dht11_dat[4] = 0;
+ 
+	pinMode( DHTPIN, OUTPUT );
+	digitalWrite( DHTPIN, LOW );
+	delay( 18 );
+	digitalWrite( DHTPIN, HIGH );
+	delayMicroseconds( 40 );
+	pinMode( DHTPIN, INPUT );
+ 
+	for ( i = 0; i < MAXTIMINGS; i++ )
+	{
+		counter = 0;
+		while ( digitalRead( DHTPIN ) == laststate )
+		{
+			counter++;
+			delayMicroseconds( 1 );
+			if ( counter == 255 )
+			{
+				break;
+			}
+		}
+		laststate = digitalRead( DHTPIN );
+ 
+		if ( counter == 255 )
 			break;
-		case T:
-			acc_reading_h = readReg8Bits(ACCEL_YOUT_H);
-			acc_reading_l = readReg8Bits(ACCEL_YOUT_L);
-			break;
-		case H:
-			acc_reading_h = readReg8Bits(ACCEL_ZOUT_H);
-			acc_reading_l = readReg8Bits(ACCEL_ZOUT_L);
-			break;
+ 
+		if ( (i >= 4) && (i % 2 == 0) )
+		{
+			dht11_dat[j / 8] <<= 1;
+			if ( counter > 16 )
+				dht11_dat[j / 8] |= 1;
+			j++;
+		}
 	}
-	return ((acc_reading_h << 8) | (acc_reading_l));
+ 
+	if ( (j >= 40) &&
+	     (dht11_dat[4] == ( (dht11_dat[0] + dht11_dat[1] + dht11_dat[2] + dht11_dat[3]) & 0xFF) ) )
+	{
+		f = dht11_dat[2] * 9. / 5. + 32;
+		printf( "Humidity = %d.%d %% Temperature = %d.%d C (%.1f F)\n",
+			dht11_dat[0], dht11_dat[1], dht11_dat[2], dht11_dat[3], f );
+	}else  {
+		printf( "Data not good, skip\n" );
+	}
 }
 
 IMU::IMU() : I2
