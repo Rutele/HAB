@@ -12,6 +12,6 @@ public:
   TEST();
   TEST(int address);
   void openDevice();
-  void read_dht11_dat();
+  void read_dht11_dat(enum choice);
 }
 #endif
