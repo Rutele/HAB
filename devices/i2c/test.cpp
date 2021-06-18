@@ -29,7 +29,7 @@ void TEST::openDevice() {
 	if (file_descriptor == -1) makeException(INIT_ERR);
 }
  
-void read_dht11_dat()
+void read_dht11_dat(enum choice)
 {
 	uint8_t laststate	= HIGH;
 	uint8_t counter		= 0;
@@ -74,11 +74,22 @@ void read_dht11_dat()
  
 	if ( (j >= 40) &&
 	     (dht11_dat[4] == ( (dht11_dat[0] + dht11_dat[1] + dht11_dat[2] + dht11_dat[3]) & 0xFF) ) )
+	
 	{
 		f = dht11_dat[2] * 9. / 5. + 32;
-		printf( "Humidity = %d.%d %% Temperature = %d.%d C (%.1f F)\n",
-			dht11_dat[0], dht11_dat[1], dht11_dat[2], dht11_dat[3], f );
-	}else  {
+		switch(choice){
+			case 0:
+			return ((dht11_dat[2] << 8) | (dht11_dat[3]));
+			break;
+			
+				
+		}
+		//return ((acc_reading_h << 8) | (acc_reading_l));
+		//printf( "Humidity = %d.%d %% Temperature = %d.%d C (%.1f F)\n",
+		//	dht11_dat[0], dht11_dat[1], dht11_dat[2], dht11_dat[3], f );
+	}
+	
+	else  {
 		printf( "Data not good, skip\n" );
 	}
 }
