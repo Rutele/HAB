@@ -12,6 +12,6 @@ public:
   TEST();
   TEST(int address);
   void openDevice();
-  int TEST::ReadMeasurements(Measurements d);
+  void read_dht11_dat();
 }
 #endif
