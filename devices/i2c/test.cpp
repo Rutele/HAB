@@ -1,7 +1,7 @@
 //NIE PATRZEC NA TO JESZCZE
 
 #include "test.hpp"
-##include <Adafruit_MS8607.h>
+#include <Adafruit_MS8607.h>
 #include <Adafruit_Sensor.h>
 #include <cerrno>
 #include <stdexcept>
@@ -81,16 +81,21 @@ void read_dht11_dat(enum choice)
 			case 0:
 			return ((dht11_dat[2] << 8) | (dht11_dat[3]));
 			break;
+			case 1:
+			return f;
+			break;
+			case 2:
+			return ((dht11_dat[0] << 8) | (dht11_dat[1]));
 			
 				
 		}
 		//return ((acc_reading_h << 8) | (acc_reading_l));
 		//printf( "Humidity = %d.%d %% Temperature = %d.%d C (%.1f F)\n",
-		//	dht11_dat[0], dht11_dat[1], dht11_dat[2], dht11_dat[3], f );
+		//	dht11_dat[0], , dht11_dat[2], dht11_dat[3], f );
 	}
 	
 	else  {
-		printf( "Data not good, skip\n" );
+		return -1;
 	}
 }
 
